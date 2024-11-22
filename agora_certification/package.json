@@ -1,13 +1,13 @@
 {
-  "name": "agora-certification",
+  "name": "agora-certification-server",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "build": "tsc -p .",
-    "docker:build:cloud": "docker build --platform linux/amd64 -t gcr.io/unicorn-hal/agora-certification .",
-    "docker:push": "docker push gcr.io/unicorn-hal/agora-certification",
+    "docker:build:cloud": "docker build --platform linux/amd64 -t gcr.io/unicorn-hal/agora-certification-server .",
+    "docker:push": "docker push gcr.io/unicorn-hal/agora-certification-server",
     "gcloud:config": "gcloud config set project unicorn-hal && gcloud auth configure-docker && gcloud auth configure-docker asia-northeast1-docker.pkg.dev",
-    "gcloud:deploy": "gcloud run deploy agora-certification --image gcr.io/unicorn-hal/agora-certification --platform managed --region asia-northeast1 --allow-unauthenticated",
+    "gcloud:deploy": "gcloud run deploy agora-certification-server --image gcr.io/unicorn-hal/agora-certification-server --platform managed --region asia-northeast1 --allow-unauthenticated --update-secrets AGORA_APP_ID=AGORA_APP_ID:latest,AGORA_APP_CERTIFICATE=AGORA_APP_CERTIFICATE:latest",
     "auth": "npm run gcloud:config && npm run gcloud:activate",
     "deploy": "npm run build && npm run docker:build:cloud && npm run docker:push && npm run gcloud:deploy"
   },
