@@ -1,4 +1,4 @@
-# API仕様書
+# Agora Token 認証サーバー - API仕様書
 
 ## 概要
 
