@@ -1,131 +1,121 @@
-# Unicornテスト用サーバー
+# API仕様書
 
-フロントエンド実装で利用する機能のテストを行うためのリポジトリです。
-Dockerコンテナで機能を分割して利用します。
+## 概要
 
-## CloudMessaging
+このAPIは、指定されたチャンネル名とユーザーIDに基づいて、Agora用のトークンを生成します。トークンの生成には認証が必要であり、各リクエストには有効な認証情報を含める必要があります。
 
-Firebase Cloud Messegingを利用して、フロントエンドにプッシュ通知を提供するサーバーです。
+## 認証
 
-### コンテナスペック
+- **認証方式**: Bearerトークン
+- **ヘッダー**:
+  - `Authorization`: `Bearer {token}` の形式で認証トークンを指定します。
 
-- Node.js v18.20.3
-- TypeScript v5.6.3
-- Express.js v4.21.1
+認証トークンが提供されない、または無効な場合、サーバーは`403 Forbidden`エラーを返します。
 
-### API仕様 
+## エンドポイント
 
-最終更新: 2024/10/24
+### トークン取得
 
-#### [POST] /send
+- **URL**: `/api/token`
+- **メソッド**: `POST`
+- **説明**: 指定されたチャンネル名とユーザーIDに対応するAgoraトークンを生成します。
 
-**Explain**
+#### リクエストヘッダー
 
-指定FCMTokenを持つ単体デバイスにメッセージを送信します。
+| ヘッダー名       | 必須 | 説明                            |
+| ---------------- | ---- | ------------------------------- |
+| Authorization    | 必須 | `Bearer {token}`形式の認証トークン |
 
-**Parameters**
+#### リクエストボディ
 
-body
-```
-token: <String> デバイスから発行されるFCMToken
-title: <String> 通知タイトル
-body:  <String> 通知本文
-```
+- **データ形式**: `application/json`
 
-**Response**
+| パラメーター名 | タイプ   | 必須 | 説明               |
+| -------------- | -------- | ---- | ------------------ |
+| channelName    | `string` | 必須 | チャンネル名       |
+| uid            | `number` | 必須 | ユーザーID         |
 
-**200** : Success
+#### レスポンス
 
-**400** : Invalid token (トークン未設定)
+- **成功時** `200 OK`
 
-**500** : Internal Server Error
+  ```json
+  {
+    "token": "<生成されたトークン>"
+  }
+  ```
 
----
+- **エラーレスポンス**
 
-#### [POST] /multicast
+  - **`400 Bad Request`**: リクエストボディに必要なパラメーターが含まれていない場合
 
-**Explain**
+    ```json
+    {
+      "error": "Bad Request"
+    }
+    ```
 
-指定FCMTokenを持つ複数デバイスにメッセージを送信します。
+  - **`403 Forbidden`**: 認証に失敗した場合
 
-**Parameters**
+    ```json
+    {
+      "error": "Forbidden"
+    }
+    ```
 
-body
-```
-tokens: <String[]> デバイスから発行されるFCMToken配列
-title:  <String>   通知タイトル
-body:   <String>   通知本文
-```
+  - **`500 Internal Server Error`**: サーバー内部でエラーが発生した場合
 
-**Response**
+    ```json
+    {
+      "error": "Internal Server Error"
+    }
+    ```
 
-**200** : Success
+## 使用例
 
-**400** : Invalid tokens (トークン未設定)
+### リクエスト例
 
-**500** : Internal Server Error
+```shell
+POST /api/token HTTP/1.1
+Host: example.com
+Content-Type: application/json
+Authorization: Bearer your_auth_token
 
----
-
-#### [POST] /topic
-
-**Explain**
-
-指定トピックを購読しているすべてのデバイスにメッセージを送信します。
-
-**Parameters**
-
-body
-```
-topic: <String> トピック名
-title: <String> 通知タイトル
-body:  <String> 通知本文
-```
-
-**Response**
-
-**200** : Success
-
-**400** : Invalid topic (未定義のトピック)
-
-**500** : Internal Server Error
-
----
-
-#### [POST] /subscribe
-
-**Explain**
-
-指定FCMTokenを持つデバイスに指定トピックを購読します。
-
-**Parameters**
-
-body
-```
-tokens: <String[]> デバイスから発行されるFCMToken配列
-topic:  <String>   トピック名
+{
+  "channelName": "testChannel",
+  "uid": 12345
+}
 ```
 
-**Response**
+### レスポンス例
 
-**200** : Success
+```json
+{
+  "token": "generated_agora_token_here"
+}
+```
 
-**400** : Invalid topic (未定義のトピック)
+## 注意事項
 
-**500** : Internal Server Error
+- `channelName`と`uid`は必須パラメーターです。欠如している場合、`400 Bad Request`エラーが返されます。
+- 認証トークンは有効である必要があります。不正または期限切れの場合、`403 Forbidden`エラーが返されます。
+- サーバーはCORSを許可しています。適切なヘッダーを設定してリクエストを行ってください。
 
----
+## サーバー情報
 
-#### [GET] /subscribe/topic
+- **ポート番号**: `8080`
+- **ホスト**: `0.0.0.0`
 
-**Explain**
+## 開発者向け情報
 
-購読可能なトピックの配列を取得します。
+- このAPIはNode.jsとExpressを使用して構築されています。
+- トークンの生成には
 
-**Response**
+AgoraTokenGenerator
 
-**200** : Success
+クラスを利用しています。
+- 認証サービスは
 
-**404** : No topics found (トピック購読不可)
+AuthenticationService
 
-**500** : Internal Server Error
+クラスを使用しています。
