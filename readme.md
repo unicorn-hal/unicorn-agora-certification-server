@@ -2,7 +2,7 @@
 
 ## 概要
 
-このAPIは、指定されたチャンネル名とユーザーIDに基づいて、Agora用のトークンを生成します。トークンの生成には認証が必要であり、各リクエストには有効な認証情報を含める必要があります。
+このAPIは、指定されたチャンネル名に基づいて、Agora用のトークンとサーバーで生成されたUIDを返します。トークンの生成には認証が必要であり、各リクエストには有効な認証情報を含める必要があります。
 
 ## シークレットの管理
 
@@ -22,22 +22,21 @@
 
 - **URL**: `/api/token`
 - **メソッド**: `POST`
-- **説明**: 指定されたチャンネル名とユーザーIDに対応するAgoraトークンを生成します。
+- **説明**: 指定されたチャンネル名に対応するAgoraトークンとサーバー生成のUIDを返します。
 
 #### リクエストヘッダー
 
-| ヘッダー名       | 必須 | 説明                            |
-| ---------------- | ---- | ------------------------------- |
-| Authorization    | 必須 | `Bearer {token}`形式の認証トークン |
+| ヘッダー名    | 必須 | 説明                            |
+| ------------- | ---- | ------------------------------- |
+| Authorization | 必須 | `Bearer {token}`形式の認証トークン |
 
 #### リクエストボディ
 
 - **データ形式**: `application/json`
 
-| パラメーター名 | タイプ   | 必須 | 説明               |
-| -------------- | -------- | ---- | ------------------ |
-| channelName    | `string` | 必須 | チャンネル名       |
-| uid            | `number` | 必須 | ユーザーID         |
+| パラメーター名 | タイプ     | 必須 | 説明       |
+| -------------- | ---------- | ---- | ---------- |
+| channelName    | `string`   | 必須 | チャンネル名 |
 
 #### レスポンス
 
@@ -45,6 +44,7 @@
 
   ```json
   {
+    "uid": <サーバーで生成されたUID>,
     "token": "<生成されたトークン>"
   }
   ```
@@ -86,8 +86,7 @@ Content-Type: application/json
 Authorization: Bearer your_auth_token
 
 {
-  "channelName": "testChannel",
-  "uid": 12345
+  "channelName": "testChannel"
 }
 ```
 
@@ -95,13 +94,15 @@ Authorization: Bearer your_auth_token
 
 ```json
 {
+  "uid": 1234567,
   "token": "generated_agora_token_here"
 }
 ```
 
 ## 注意事項
 
-- `channelName`と`uid`は必須パラメーターです。欠如している場合、`400 Bad Request`エラーが返されます。
+- `channelName`は必須パラメーターです。欠如している場合、`400 Bad Request`エラーが返されます。
+- `uid`はサーバー側で生成され、レスポンスに含まれます。
 - 認証トークンは有効である必要があります。不正または期限切れの場合、`403 Forbidden`エラーが返されます。
 - サーバーはCORSを許可しています。適切なヘッダーを設定してリクエストを行ってください。
 
@@ -113,13 +114,5 @@ Authorization: Bearer your_auth_token
 ## 開発者向け情報
 
 - このAPIはNode.jsとExpressを使用して構築されています。
-- トークンの生成には
-
-AgoraTokenGenerator
-
-クラスを利用しています。
-- 認証サービスは
-
-AuthenticationService
-
-クラスを使用しています。
+- トークンの生成には `AgoraTokenGenerator` クラスを利用しています。
+- 認証サービスは `AuthenticationService` クラスを使用しています。
