@@ -48,14 +48,15 @@ app.use((req, res, next) => {
     next();
 });
 
-// 各トークンを取得するエンドポイント
+// トークンを取得するエンドポイント
 app.post('/api/token', (req, res) => {
     const channelName: string = req.body.channelName;
     const uid: number = parseInt(req.body.uid);
 
     try {
         const agoraTokenGenerator = new AgoraTokenGenerator(channelName, uid);
-        const token = agoraTokenGenerator.generateRtmTokenWithUid();
+        //  const token = agoraTokenGenerator.generateRtmTokenWithUid();
+        const token = agoraTokenGenerator.generateRtcTokenWithUid();
         res.status(200).json({ token });
     } catch (error) {
         console.error(error);
