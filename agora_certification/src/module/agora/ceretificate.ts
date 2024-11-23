@@ -8,8 +8,8 @@ export class AgoraTokenGenerator {
     private role: number;
 
     constructor(channelName: string, uid: number, account?: string | undefined) {
-        this.appId = process.env.AGORA_APP_ID || '23a1af5689e6478487f7bca4de0f41e7';
-        this.appCertificate = process.env.AGORA_APP_CERTIFICATE || 'ae6084faa33644e6915bc6ba091f6310';
+        this.appId = process.env.AGORA_APP_ID;
+        this.appCertificate = process.env.AGORA_APP_CERTIFICATE;
         this.channelName = channelName;
         this.uid = uid;
         this.role = RtcRole.PUBLISHER;
