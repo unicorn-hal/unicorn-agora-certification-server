@@ -1,5 +1,5 @@
 import express from 'express';
-import { AgoraTokenGenerator } from './module/agora/ceretificate';
+import { AgoraCertificatedData, AgoraTokenGenerator } from './module/agora/ceretificate';
 import { AuthenticationService } from './module/firebase/authentication_service';
 
 const app = express();
@@ -41,7 +41,7 @@ app.use(async (req, res, next) => {
 
 // リクエストボディのバリデーション
 app.use((req, res, next) => {
-    if (req.body.channelName === undefined || req.body.uid === undefined) {
+    if (req.body.channelName === undefined) {
         res.status(400).json({ error: 'Bad Request' });
         return;
     }
@@ -51,13 +51,11 @@ app.use((req, res, next) => {
 // トークンを取得するエンドポイント
 app.post('/api/token', (req, res) => {
     const channelName: string = req.body.channelName;
-    const uid: number = parseInt(req.body.uid);
 
     try {
-        const agoraTokenGenerator = new AgoraTokenGenerator(channelName, uid);
-        //  const token = agoraTokenGenerator.generateRtmTokenWithUid();
-        const token = agoraTokenGenerator.generateRtcTokenWithUid();
-        res.status(200).json({ token });
+        const agoraTokenGenerator = new AgoraTokenGenerator(channelName);
+        const certData: AgoraCertificatedData = agoraTokenGenerator.generateRtcTokenWithUid();
+        res.status(200).json(certData);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
