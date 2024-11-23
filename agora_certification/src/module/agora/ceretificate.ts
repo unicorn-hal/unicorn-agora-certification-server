@@ -1,32 +1,18 @@
-import { RtcTokenBuilder, Role as RtcRole } from './rtc_token_builder';
+import { RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole } from 'agora-access-token';
 
 export class AgoraTokenGenerator {
     private appId: string;
     private appCertificate: string;
     private channelName: string;
     private uid: number;
-    // private account: string;
-    private role: RtcRole;
-    private tokenExpirationInSecond: number;
-    private privilegeExpirationInSecond: number;
-    // private joinChannelPrivilegeExpireInSeconds: number;
-    // private pubAudioPrivilegeExpireInSeconds: number;
-    // private pubVideoPrivilegeExpireInSeconds: number;
-    // private pubDataStreamPrivilegeExpireInSeconds: number;
+    private role: number;
 
     constructor(channelName: string, uid: number, account?: string | undefined) {
-        this.appId = process.env.AGORA_APP_ID || '';
-        this.appCertificate = process.env.AGORA_APP_CERTIFICATE || '';
+        this.appId = process.env.AGORA_APP_ID || '23a1af5689e6478487f7bca4de0f41e7';
+        this.appCertificate = process.env.AGORA_APP_CERTIFICATE || 'ae6084faa33644e6915bc6ba091f6310';
         this.channelName = channelName;
         this.uid = uid;
-        // this.account = account || '';
         this.role = RtcRole.PUBLISHER;
-        this.tokenExpirationInSecond = 3600;
-        this.privilegeExpirationInSecond = 3600;
-        // this.joinChannelPrivilegeExpireInSeconds = 3600;
-        // this.pubAudioPrivilegeExpireInSeconds = 3600;
-        // this.pubVideoPrivilegeExpireInSeconds = 3600;
-        // this.pubDataStreamPrivilegeExpireInSeconds = 3600;
 
         if (this.appId === '' || this.appCertificate === '') {
             console.log('環境変数 AGORA_APP_ID と AGORA_APP_CERTIFICATE を設定する必要があります');
@@ -34,67 +20,13 @@ export class AgoraTokenGenerator {
         }
     }
 
-    generateTokenWithUid(): string {
-        return RtcTokenBuilder.buildTokenWithUid(
+    public generateRtmTokenWithUid(): string {
+        return RtmTokenBuilder.buildToken(
             this.appId,
             this.appCertificate,
             this.channelName,
             this.uid,
             this.role,
-            this.tokenExpirationInSecond,
-            this.privilegeExpirationInSecond
         );
     }
-
-    // generateTokenWithUserAccount(): string {
-    //     return RtcTokenBuilder.buildTokenWithUserAccount(
-    //         this.appId,
-    //         this.appCertificate,
-    //         this.channelName,
-    //         this.account,
-    //         this.role,
-    //         this.tokenExpirationInSecond,
-    //         this.privilegeExpirationInSecond
-    //     );
-    // }
-
-    // generateTokenWithUidAndPrivilege(): string {
-    //     return RtcTokenBuilder.buildTokenWithUidAndPrivilege(
-    //         this.appId,
-    //         this.appCertificate,
-    //         this.channelName,
-    //         this.uid,
-    //         this.tokenExpirationInSecond,
-    //         this.joinChannelPrivilegeExpireInSeconds,
-    //         this.pubAudioPrivilegeExpireInSeconds,
-    //         this.pubVideoPrivilegeExpireInSeconds,
-    //         this.pubDataStreamPrivilegeExpireInSeconds
-    //     );
-    // }
-
-    // generateTokenWithUserAccountAndPrivilege(): string {
-    //     return RtcTokenBuilder.buildTokenWithUserAccountAndPrivilege(
-    //         this.appId,
-    //         this.appCertificate,
-    //         this.channelName,
-    //         this.account,
-    //         this.tokenExpirationInSecond,
-    //         this.joinChannelPrivilegeExpireInSeconds,
-    //         this.pubAudioPrivilegeExpireInSeconds,
-    //         this.pubVideoPrivilegeExpireInSeconds,
-    //         this.pubDataStreamPrivilegeExpireInSeconds
-    //     );
-    // }
-
-    // generateTokenWithRtm(): string {
-    //     return RtcTokenBuilder.buildTokenWithRtm(
-    //         this.appId,
-    //         this.appCertificate,
-    //         this.channelName,
-    //         this.account,
-    //         this.role,
-    //         this.tokenExpirationInSecond,
-    //         this.privilegeExpirationInSecond
-    //     );
-    // }
 }
